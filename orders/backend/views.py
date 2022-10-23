@@ -8,15 +8,17 @@ from django.db.models import Q, Sum, F
 from django.http import JsonResponse
 from requests import get
 from rest_framework.authtoken.models import Token
-from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from ujson import loads as load_json
 from .models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, Order, OrderItem, \
     Contact, ConfirmEmailToken
 from .serializers import UserSerializer, CategorySerializer, ShopSerializer, ProductInfoSerializer, \
     OrderItemSerializer, OrderSerializer, ContactSerializer
 from .signals import new_user_registered, new_order
+from .permissions import IsAdminOrReadOnly
 
 
 class RegisterAccount(APIView):
@@ -82,7 +84,7 @@ class ConfirmAccount(APIView):
 
 class AccountDetails(APIView):
     """
-    Класс для работы данными пользователя
+    Класс для работы с данными пользователя
     """
 
     # получить данные
@@ -143,20 +145,23 @@ class LoginAccount(APIView):
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
 
 
-class CategoryView(ListAPIView):
+class APICategoryViewSet(ModelViewSet):
     """
-    Класс для просмотра категорий
+    Класс для просмотра и изменения категорий
     """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = (IsAdminOrReadOnly,)
 
 
-class ShopView(ListAPIView):
+
+class APIShopViewSet(ModelViewSet):
     """
-    Класс для просмотра списка магазинов
+    Класс для просмотра и изменения магазинов
     """
     queryset = Shop.objects.filter(state=True)
     serializer_class = ShopSerializer
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class ProductInfoView(APIView):
@@ -175,7 +180,7 @@ class ProductInfoView(APIView):
         if category_id:
             query = query & Q(product__category_id=category_id)
 
-        # фильтруем и отбрасываем дуликаты
+        # фильтруем и отбрасываем дубликаты
         queryset = ProductInfo.objects.filter(
             query).select_related(
             'shop', 'product__category').prefetch_related(
@@ -334,6 +339,7 @@ class PartnerState(APIView):
     """
     Класс для работы со статусом поставщика
     """
+    permission_classes = (IsAuthenticated,)
 
     # получить текущий статус
     def get(self, request, *args, **kwargs):
@@ -371,6 +377,7 @@ class PartnerOrders(APIView):
     """
     Класс для получения заказов поставщиками
     """
+
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
@@ -408,7 +415,6 @@ class ContactView(APIView):
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
         if {'city', 'street', 'phone'}.issubset(request.data):
-            request.data._mutable = True
             request.data.update({'user': request.user.id})
             serializer = ContactSerializer(data=request.data)
 

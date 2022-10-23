@@ -14,9 +14,6 @@ import os
 import environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -42,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'backend.apps.BackendConfig',
     'rest_framework',
+    'corsheaders',
     'rest_framework.authtoken',
     'bootstrap4',
 ]
@@ -49,6 +47,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -86,14 +85,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': 'diplom_db',
-    #     'USER': 'diplom_user',
-    #     'PASSWORD': 'password',
-    #     'HOST': '127.0.0.1',
-    #     'PORT': '5433',
-    # }
 }
 
 # Password validation
@@ -165,3 +156,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
+
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_URLS_REGEX = r'^/api/.*$'
