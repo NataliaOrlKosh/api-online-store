@@ -154,7 +154,6 @@ class APICategoryViewSet(ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
 
 
-
 class APIShopViewSet(ModelViewSet):
     """
     Класс для просмотра и изменения магазинов
