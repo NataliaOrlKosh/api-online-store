@@ -1,10 +1,11 @@
 from django.urls import path, include
 from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
 from rest_framework.routers import DefaultRouter
-
+from drf_spectacular.views import SpectacularAPIView
 from .views import PartnerUpdate, RegisterAccount, LoginAccount, APICategoryViewSet, APIShopViewSet, ProductInfoView, \
     BasketView, \
     AccountDetails, OrderView, PartnerState, PartnerOrders, ConfirmAccount, ContactView
+
 
 app_name = 'backend'
 
@@ -26,5 +27,6 @@ urlpatterns = [
     path('products', ProductInfoView.as_view(), name='products'),
     path('basket', BasketView.as_view(), name='basket'),
     path('order', OrderView.as_view(), name='order'),
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('', include(router.urls))
 ]
