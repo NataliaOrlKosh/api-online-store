@@ -41,4 +41,9 @@ python manage.py runserver
 
     https://documenter.getpostman.com/view/20449657/2s847ESa96
     
-    
+##  В проекте также реализовано:
+
+- throttling
+- возможность авторизации через социальную сеть ВКонтакте
+- автогенерация документации Open API в рамках пакета DRF-Spectacular
+- celery для отправки писем
